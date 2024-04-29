@@ -86,4 +86,4 @@ if __name__ == "__main__":
         rta = compuesto_(fundamentales,reorganizados)
         print(fundamentales)
         print(reorganizados)
-       # print(rta)
+        print(rta)
