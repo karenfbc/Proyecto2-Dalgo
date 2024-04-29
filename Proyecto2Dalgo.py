@@ -56,16 +56,6 @@ def camino_euler(fundamentales):
 def enlace_toll(fundamentales):
     pass
 
-    graph = {}
-    grado = {}
-    nodos = set()
-
-    for start, end in fundamentales:
-        add_arco(graph, start, end, grado)
-        nodos.update([start, end])
-
-    return graph, grado, nodos
-
 
 def reorganizar_fund(fundamentales):
     fund_reorganizado = []
