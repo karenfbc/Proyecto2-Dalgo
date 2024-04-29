@@ -1,7 +1,7 @@
 import sys
 from collections import defaultdict, deque
 
-def compuesto_(fundamentales, fund_organizados):
+def compuesto_(fundamentales, fund_organizados, libres, w1, w2):
     dicc_comprobacion = {}
 
     for numero, etiqueta in fund_organizados:
@@ -14,6 +14,8 @@ def compuesto_(fundamentales, fund_organizados):
     fundamentales_ordenados = camino_euler(fundamentales)
     print(fundamentales_ordenados)
     fund_toll= enlace_toll(fundamentales_ordenados)
+    energia= energia_necesaria(libres,w1,w2)
+    print(energia)
 
     return fund_toll
 
@@ -65,10 +67,29 @@ def enlace_toll(fundamentales):
         resultado.append(fundamentales[i])
     return resultado
 
-def enlaces_boltz(fundamentales, libres):
+def enlaces_boltz(fundamentales, libres, w1, w2):
     pass
 
-
+def calcular_ltp(m1, c1, m2, c2, w1, w2):
+    if c1 == c2:
+        return 1 + abs(m1 - m2) % w1
+    else:
+        return w2 - abs(m1 - m2) % w2
+    
+def energia_necesaria(libres,w1,w2):
+    n = len(libres)
+    dp = [[float('inf')] * n for _ in range(n)]
+    for i in range(n):
+        for j in range(n):
+            if (libres[i]< 0 and libres[j]< 0) or (libres[i]>= 0 and libres[j]>= 0):
+                m1= abs(libres[i])
+                m2= abs(libres[j])
+                dp[i][j]=calcular_ltp(m1,"igual",m2, "igual",w1, w2)
+            elif (libres[i]< 0 and libres[j]>= 0) or (libres[i]>= 0 and libres[j]< 0):
+                m1= abs(libres[i])
+                m2= abs(libres[j])
+                dp[i][j]=calcular_ltp(m1,"positivo",m2, "negativo",w1, w2)
+    return dp
 def reorganizar_fund(fundamentales):
     fund_reorganizado = []
     for inicio, final in fundamentales:
@@ -81,11 +102,19 @@ if __name__ == "__main__":
     for _ in range(number_of_cases):
         n, w1, w2 = map(int, sys.stdin.readline().split())
         fundamentales = []
+        libres=[]
         for l in range(n):
             n1, n2 = map(int, sys.stdin.readline().strip().split())
             fundamentales.append((n1, n2))
+            if n1 not in libres:
+                libres.append(n1)
+                libres.append(-n1)
+            if n2 not in libres:
+                libres.append(n2)
+                libres.append(-n2)
         reorganizados = reorganizar_fund(fundamentales)
-        rta = compuesto_(fundamentales,reorganizados)
+        rta = compuesto_(fundamentales,reorganizados,libres,w1,w2)
         print(fundamentales)
         print(reorganizados)
+        print(libres)
         print(rta)
