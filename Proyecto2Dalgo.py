@@ -1,35 +1,61 @@
 import sys
-from collections import deque
+from collections import defaultdict, deque
 
 def compuesto_(fundamentales, fund_organizados):
     dicc_comprobacion = {}
+
     for numero, etiqueta in fund_organizados:
         if numero in dicc_comprobacion:
             if dicc_comprobacion[numero] != etiqueta:
                 return "NO SE PUEDE"
         else:
             dicc_comprobacion[numero] = etiqueta
-    rta=iniciar_grafo(fundamentales)
-    return rta
+
+    fundamentales_ordenados = camino_euler(fundamentales)
+
+    return fundamentales_ordenados
+
+def camino_euler(fundamentales):
+    grafo = defaultdict(list)
+    aristas = defaultdict(int)
+    for u, v in fundamentales:
+        grafo[u].append(v)
+        grafo[v].append(u)
+        aristas[u] += 1
+        aristas[v] += 1
+
+    inicio = fundamentales[0][0]
+    for nodo in aristas:
+        if aristas[nodo] % 2 != 0:
+            inicio = nodo
+            break
+
+    def dfs(v):
+        stack = [v]
+        camino = []
+        while stack:
+            nodo = stack[-1]
+            if grafo[nodo]:
+                nodo_sig = grafo[nodo].pop()
+                grafo[nodo_sig].remove(nodo)
+                stack.append(nodo_sig)
+            else:
+                camino.append(stack.pop())
+        return camino[::-1]
+
+    camino = dfs(inicio)
+
+    parejas_camino = []
+    for i in range(len(camino) - 1):
+        parejas_camino.append((camino[i], camino[i + 1]))
+
+    return parejas_camino
+
+
 
 def enlace_toll(fundamentales):
     pass
 
-def add_arco(fundamentales, start, end, grado):
-    if start in fundamentales:
-        fundamentales[start].append(end)
-    else:
-        fundamentales[start] = [end]
-    if end not in fundamentales:
-        fundamentales[end] = []
-    if end in grado:
-        grado[end] += 1
-    else:
-        grado[end] = 1
-    if start not in grado:
-        grado[start] = 0
-
-def iniciar_grafo(fundamentales):
     graph = {}
     grado = {}
     nodos = set()
@@ -60,4 +86,4 @@ if __name__ == "__main__":
         rta = compuesto_(fundamentales,reorganizados)
         print(fundamentales)
         print(reorganizados)
-        print(rta)
+       # print(rta)
