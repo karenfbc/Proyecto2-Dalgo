@@ -67,7 +67,7 @@ def enlace_toll(fundamentales):
         resultado.append(fundamentales[i])
     return resultado
 
-def enlaces_boltz(fundamentales, libres, w1, w2):
+def enlaces_boltz(fundamentales, toll, libres, energia):
     pass
 
 def calcular_ltp(m1, c1, m2, c2, w1, w2):
@@ -81,7 +81,9 @@ def energia_necesaria(libres,w1,w2):
     dp = [[float('inf')] * n for _ in range(n)]
     for i in range(n):
         for j in range(n):
-            if (libres[i]< 0 and libres[j]< 0) or (libres[i]>= 0 and libres[j]>= 0):
+            if libres[i]==libres[j]:
+                dp[i][j]=10000
+            elif (libres[i]< 0 and libres[j]< 0) or (libres[i]>= 0 and libres[j]>= 0):
                 m1= abs(libres[i])
                 m2= abs(libres[j])
                 dp[i][j]=calcular_ltp(m1,"igual",m2, "igual",w1, w2)
@@ -90,6 +92,7 @@ def energia_necesaria(libres,w1,w2):
                 m2= abs(libres[j])
                 dp[i][j]=calcular_ltp(m1,"positivo",m2, "negativo",w1, w2)
     return dp
+
 def reorganizar_fund(fundamentales):
     fund_reorganizado = []
     for inicio, final in fundamentales:
