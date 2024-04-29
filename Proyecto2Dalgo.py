@@ -12,8 +12,10 @@ def compuesto_(fundamentales, fund_organizados):
             dicc_comprobacion[numero] = etiqueta
 
     fundamentales_ordenados = camino_euler(fundamentales)
+    print(fundamentales_ordenados)
+    fund_toll= enlace_toll(fundamentales_ordenados)
 
-    return fundamentales_ordenados
+    return fund_toll
 
 def camino_euler(fundamentales):
     grafo = defaultdict(list)
@@ -54,6 +56,16 @@ def camino_euler(fundamentales):
 
 
 def enlace_toll(fundamentales):
+    resultado = []
+    resultado.append(fundamentales[0])
+
+    for i in range(1, len(fundamentales)):
+        nodo_intermedio = -fundamentales[i-1][1]
+        resultado.append(nodo_intermedio)
+        resultado.append(fundamentales[i])
+    return resultado
+
+def enlaces_boltz(fundamentales, libres):
     pass
 
 
