@@ -12,7 +12,7 @@ def compuesto_(fundamentales, fund_organizados, libres, w1, w2):
             dicc_comprobacion[numero] = etiqueta
 
     fundamentales_ordenados = camino_euler(fundamentales)
-    print(fundamentales_ordenados)
+    #print(fundamentales_ordenados)
     fund_toll= enlace_toll(fundamentales_ordenados)
     consulta_camino = energia_necesaria(libres, w1, w2, fundamentales)
     costoT=0
@@ -22,18 +22,16 @@ def compuesto_(fundamentales, fund_organizados, libres, w1, w2):
         nod2=fund_toll[i+1]
         pos1= libres.index(nod1)
         pos2= libres.index(nod2)
-        costo_camino, caminos = consulta_camino(pos1, pos2)  # Consultar el camino de 2 a 5, por ejemplo
+        costo_camino, caminos = consulta_camino(pos1, pos2) 
         camino.append(fund_toll[i])
         costoT+=costo_camino
         for j in caminos[1:]:
             camino.append(libres[j])
     camino.append(fund_toll[-1])
-    print(costoT)
-    print("Camino:", camino)
     #caminoMinimo=floyd_warshall(energia)
     #print(caminoMinimo)
 
-    return fund_toll
+    return f'{camino} {costoT}'
 
 def camino_euler(fundamentales):
     grafo = defaultdict(list)
@@ -80,15 +78,6 @@ def enlace_toll(fundamentales):
         resultado.append(nodo_intermedio)
         resultado.append(fundamentales[i])
     return resultado
-
-"""def floyd_warshall(grafo):
-    graph_size = len(grafo)
-    for initial in range(0,graph_size) :
-        for middle in range(0,graph_size) :
-            for end in range(0,graph_size) :
-                grafo[initial][end] = min(grafo[initial][end],
-                                          grafo[initial][middle] + grafo[middle][end])
-    return grafo"""
 
 def calcular_ltp(m1, c1, m2, c2, w1, w2):
     if c1 == c2:
@@ -172,8 +161,8 @@ if __name__ == "__main__":
                 libres.append(-n2)
         reorganizados = reorganizar_fund(fundamentales)
         rta = compuesto_(fundamentales,reorganizados,libres,w1,w2)
-        print(fundamentales)
-        print(reorganizados)
-        print(libres)
+        #print(fundamentales)
+        #print(reorganizados)
+        #print(libres)
         print(rta)
 
