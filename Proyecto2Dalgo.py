@@ -81,25 +81,53 @@ def calcular_ltp(m1, c1, m2, c2, w1, w2):
     else:
         return w2 - abs(m1 - m2) % w2
     
-def energia_necesaria(libres,w1,w2,fundamentales):
+def energia_necesaria(libres, w1, w2, fundamentales):
     n = len(libres)
     dp = [[float('inf')] * n for _ in range(n)]
+    next = [[-1] * n for _ in range(n)]
+    
+    # Inicializar la matriz de costos y la matriz de rutas
     for i in range(n):
         for j in range(n):
-            if (libres[i],libres[j]) in fundamentales:
-                dp[i][j]=10000
-            elif abs(libres[i])==abs(libres[j]):
-                dp[i][j]=10000
-            elif (libres[i]< 0 and libres[j]< 0) or (libres[i]>= 0 and libres[j]>= 0):
-                m1= abs(libres[i])
-                m2= abs(libres[j])
-                dp[i][j]=calcular_ltp(m1,"igual",m2, "igual",w1, w2)
-            elif (libres[i]< 0 and libres[j]>= 0) or (libres[i]>= 0 and libres[j]< 0):
-                m1= abs(libres[i])
-                m2= abs(libres[j])
-                dp[i][j]=calcular_ltp(m1,"positivo",m2, "negativo",w1, w2)
-    print(dp)
-    return dp
+            if (libres[i], libres[j]) in fundamentales or abs(libres[i]) == abs(libres[j]):
+                dp[i][j] = 10000
+            elif (libres[i] < 0 and libres[j] < 0) or (libres[i] >= 0 and libres[j] >= 0):
+                m1 = abs(libres[i])
+                m2 = abs(libres[j])
+                dp[i][j] = calcular_ltp(m1, "igual", m2, "igual", w1, w2)
+            elif (libres[i] < 0 and libres[j] >= 0) or (libres[i] >= 0 and libres[j] < 0):
+                m1 = abs(libres[i])
+                m2 = abs(libres[j])
+                dp[i][j] = calcular_ltp(m1, "positivo", m2, "negativo", w1, w2)
+            if dp[i][j] != float('inf'):
+                next[i][j] = j
+
+    # Algoritmo de Floyd-Warshall
+    for k in range(n):
+        for i in range(n):
+            for j in range(n):
+                if dp[i][j] > dp[i][k] + dp[k][j]:
+                    dp[i][j] = dp[i][k] + dp[k][j]
+                    next[i][j] = next[i][k]
+
+    # Recuperar el camino
+    def get_path(i, j):
+        if next[i][j] == -1:
+            return []
+        path = [i]
+        while i != j:
+            i = next[i][j]
+            path.append(i)
+        return path
+
+    # Opcional: imprimir todos los caminos mínimos
+    for i in range(n):
+        for j in range(n):
+            if i != j and dp[i][j] != float('inf'):
+                print(f"Camino mínimo de {i} a {j}: {get_path(i, j)} con costo {dp[i][j]}")
+    
+    return dp, next
+
 
 def reorganizar_fund(fundamentales):
     fund_reorganizado = []
