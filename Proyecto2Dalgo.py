@@ -1,17 +1,11 @@
 import sys
 from collections import defaultdict, deque
 
-def compuesto_(fundamentales, fund_organizados, libres, w1, w2):
-    dicc_comprobacion = {}
-
-    for numero, etiqueta in fund_organizados:
-        if numero in dicc_comprobacion:
-            if dicc_comprobacion[numero] != etiqueta:
-                return "NO SE PUEDE"
-        else:
-            dicc_comprobacion[numero] = etiqueta
+def compuesto_(fundamentales, libres, w1, w2):
 
     fundamentales_ordenados = camino_euler(fundamentales)
+    if len(fundamentales_ordenados)<len(fundamentales):
+        return "NO SE PUEDE"
     #print(fundamentales_ordenados)
     fund_toll= enlace_toll(fundamentales_ordenados)
     consulta_camino = energia_necesaria(libres, w1, w2, fundamentales)
@@ -137,13 +131,6 @@ def energia_necesaria(libres, w1, w2, fundamentales):
     return consulta_camino
 
 
-def reorganizar_fund(fundamentales):
-    fund_reorganizado = []
-    for inicio, final in fundamentales:
-        fund_reorganizado.append((abs(inicio), "positivo" if inicio >= 0 else "negativo"))
-        fund_reorganizado.append((abs(final), "positivo" if final >= 0 else "negativo"))
-    return fund_reorganizado
-
 if __name__ == "__main__":
     number_of_cases = int(sys.stdin.readline().strip())
     for _ in range(number_of_cases):
@@ -159,8 +146,8 @@ if __name__ == "__main__":
             if n2 not in libres:
                 libres.append(n2)
                 libres.append(-n2)
-        reorganizados = reorganizar_fund(fundamentales)
-        rta = compuesto_(fundamentales,reorganizados,libres,w1,w2)
+        #reorganizados = reorganizar_fund(fundamentales)
+        rta = compuesto_(fundamentales,libres,w1,w2)
         #print(fundamentales)
         #print(reorganizados)
         #print(libres)
