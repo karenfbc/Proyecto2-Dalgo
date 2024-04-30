@@ -14,7 +14,10 @@ def compuesto_(fundamentales, fund_organizados, libres, w1, w2):
     fundamentales_ordenados = camino_euler(fundamentales)
     print(fundamentales_ordenados)
     fund_toll= enlace_toll(fundamentales_ordenados)
-    energia= energia_necesaria(libres,w1,w2,fundamentales_ordenados)
+    energia, next, consulta_camino = energia_necesaria(libres, w1, w2, fundamentales)
+    costo_camino, camino = consulta_camino(2, 5)  # Consultar el camino de 2 a 5, por ejemplo
+    print(costo_camino)
+    print("Camino:", camino)
     caminoMinimo=floyd_warshall(energia)
     print(caminoMinimo)
 
@@ -110,7 +113,7 @@ def energia_necesaria(libres, w1, w2, fundamentales):
                     dp[i][j] = dp[i][k] + dp[k][j]
                     next[i][j] = next[i][k]
 
-    # Recuperar el camino
+    # Función para obtener el camino
     def get_path(i, j):
         if next[i][j] == -1:
             return []
@@ -120,13 +123,17 @@ def energia_necesaria(libres, w1, w2, fundamentales):
             path.append(i)
         return path
 
-    # Opcional: imprimir todos los caminos mínimos
-    for i in range(n):
-        for j in range(n):
-            if i != j and dp[i][j] != float('inf'):
-                print(f"Camino mínimo de {i} a {j}: {get_path(i, j)} con costo {dp[i][j]}")
+    # Función para consultar el camino y el costo entre dos vértices específicos
+    def consulta_camino(origen, destino):
+        if origen < 0 or destino < 0 or origen >= n or destino >= n:
+            return "Índices fuera de rango", []
+        if dp[origen][destino] == float('inf'):
+            return "No hay camino disponible", []
+        camino = get_path(origen, destino)
+        costo = dp[origen][destino]
+        return f"Costo del camino de {origen} a {destino}: {costo}", camino
     
-    return dp, next
+    return dp, next, consulta_camino
 
 
 def reorganizar_fund(fundamentales):
@@ -157,3 +164,4 @@ if __name__ == "__main__":
         print(reorganizados)
         print(libres)
         print(rta)
+
