@@ -14,12 +14,24 @@ def compuesto_(fundamentales, fund_organizados, libres, w1, w2):
     fundamentales_ordenados = camino_euler(fundamentales)
     print(fundamentales_ordenados)
     fund_toll= enlace_toll(fundamentales_ordenados)
-    energia, next, consulta_camino = energia_necesaria(libres, w1, w2, fundamentales)
-    costo_camino, camino = consulta_camino(2, 5)  # Consultar el camino de 2 a 5, por ejemplo
-    print(costo_camino)
+    consulta_camino = energia_necesaria(libres, w1, w2, fundamentales)
+    costoT=0
+    camino = []
+    for i in range(0,len(fund_toll)-1,2):
+        nod1=fund_toll[i][1]
+        nod2=fund_toll[i+1]
+        pos1= libres.index(nod1)
+        pos2= libres.index(nod2)
+        costo_camino, caminos = consulta_camino(pos1, pos2)  # Consultar el camino de 2 a 5, por ejemplo
+        camino.append(fund_toll[i])
+        costoT+=costo_camino
+        for j in caminos[1:]:
+            camino.append(libres[j])
+    camino.append(fund_toll[-1])
+    print(costoT)
     print("Camino:", camino)
-    caminoMinimo=floyd_warshall(energia)
-    print(caminoMinimo)
+    #caminoMinimo=floyd_warshall(energia)
+    #print(caminoMinimo)
 
     return fund_toll
 
@@ -69,14 +81,14 @@ def enlace_toll(fundamentales):
         resultado.append(fundamentales[i])
     return resultado
 
-def floyd_warshall(grafo):
+"""def floyd_warshall(grafo):
     graph_size = len(grafo)
     for initial in range(0,graph_size) :
         for middle in range(0,graph_size) :
             for end in range(0,graph_size) :
                 grafo[initial][end] = min(grafo[initial][end],
                                           grafo[initial][middle] + grafo[middle][end])
-    return grafo
+    return grafo"""
 
 def calcular_ltp(m1, c1, m2, c2, w1, w2):
     if c1 == c2:
@@ -131,9 +143,9 @@ def energia_necesaria(libres, w1, w2, fundamentales):
             return "No hay camino disponible", []
         camino = get_path(origen, destino)
         costo = dp[origen][destino]
-        return f"Costo del camino de {origen} a {destino}: {costo}", camino
+        return costo, camino
     
-    return dp, next, consulta_camino
+    return consulta_camino
 
 
 def reorganizar_fund(fundamentales):
