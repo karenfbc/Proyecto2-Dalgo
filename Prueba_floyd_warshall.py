@@ -1,163 +1,42 @@
+def floyd_warshall(weights):
+    n = len(weights)
+    dist = [row[:] for row in weights]  # Copia la matriz original
 
-import sys
-from collections import defaultdict, deque
-
-def compuesto_(fundamentales, fund_organizados, libres, w1, w2):
-    error, fundamentales_ordenados = camino_euler(fundamentales)
-    if error:  # Si hay un mensaje de error, retornarlo
-        return error
-
-    fund_toll = enlace_toll(fundamentales_ordenados)
-    consulta_camino = energia_necesaria(libres, w1, w2, fundamentales)
-    costoT = 0
-    camino = []
-    for i in range(0, len(fund_toll) - 1, 2):
-        nod1 = fund_toll[i][1]
-        nod2 = fund_toll[i + 1]
-        pos1 = libres.index(nod1)
-        pos2 = libres.index(nod2)
-        costo_camino, caminos = consulta_camino(pos1, pos2)
-        camino.append(fund_toll[i])
-        costoT += costo_camino
-        for j in caminos[1:]:
-            camino.append(libres[j])
-    camino.append(fund_toll[-1])
-
-    return f'{camino} {costoT}'
-
-
-def camino_euler(fundamentales):
-    grafo = defaultdict(list)
-    aristas = defaultdict(int)
-    for u, v in fundamentales:
-        grafo[u].append(v)
-        grafo[v].append(u)
-        aristas[u] += 1
-        aristas[v] += 1
-
-    nodos_impares = [nodo for nodo, grado in aristas.items() if grado % 2 != 0]
-    if len(nodos_impares) > 2:
-        return "NO SE PUEDE", []  # Más de dos nodos con grado impar no permiten un camino euleriano
-
-    # Encontrar el inicio del camino, que debe ser uno de los nodos impares si hay exactamente dos,
-    # o cualquier nodo si todos tienen grados pares
-    inicio = nodos_impares[0] if len(nodos_impares) == 1 else next(iter(grafo))
-
-    def dfs(v):
-        stack = [v]
-        camino = []
-        while stack:
-            nodo = stack[-1]
-            if grafo[nodo]:
-                nodo_sig = grafo[nodo].pop()
-                grafo[nodo_sig].remove(nodo)
-                stack.append(nodo_sig)
-            else:
-                camino.append(stack.pop())
-        return camino[::-1]
-
-    camino = dfs(inicio)
-    parejas_camino = []
-    for i in range(len(camino) - 1):
-        parejas_camino.append((camino[i], camino[i + 1]))
-
-    return "", parejas_camino
-
-
-def enlace_toll(fundamentales):
-    resultado = []
-    resultado.append(fundamentales[0])
-
-    for i in range(1, len(fundamentales)):
-        nodo_intermedio = -fundamentales[i-1][1]
-        resultado.append(nodo_intermedio)
-        resultado.append(fundamentales[i])
-    return resultado
-
-def calcular_ltp(m1, c1, m2, c2, w1, w2):
-    if c1 == c2:
-        return 1 + abs(m1 - m2) % w1
-    else:
-        return w2 - abs(m1 - m2) % w2
-    
-def energia_necesaria(libres, w1, w2, fundamentales):
-    n = len(libres)
-    dp = [[float('inf')] * n for _ in range(n)]
-    next = [[-1] * n for _ in range(n)]
-    
-    # Inicializar la matriz de costos y la matriz de rutas
-    for i in range(n):
-        for j in range(n):
-            if (libres[i], libres[j]) in fundamentales or abs(libres[i]) == abs(libres[j]):
-                dp[i][j] = 10000
-            elif (libres[i] < 0 and libres[j] < 0) or (libres[i] >= 0 and libres[j] >= 0):
-                m1 = abs(libres[i])
-                m2 = abs(libres[j])
-                dp[i][j] = calcular_ltp(m1, "igual", m2, "igual", w1, w2)
-            elif (libres[i] < 0 and libres[j] >= 0) or (libres[i] >= 0 and libres[j] < 0):
-                m1 = abs(libres[i])
-                m2 = abs(libres[j])
-                dp[i][j] = calcular_ltp(m1, "positivo", m2, "negativo", w1, w2)
-            if dp[i][j] != float('inf'):
-                next[i][j] = j
-
-    # Algoritmo de Floyd-Warshall
+    # Actualizar distancias usando el algoritmo de Floyd-Warshall
     for k in range(n):
         for i in range(n):
             for j in range(n):
-                if dp[i][j] > dp[i][k] + dp[k][j]:
-                    dp[i][j] = dp[i][k] + dp[k][j]
-                    next[i][j] = next[i][k]
+                if dist[i][j] > dist[i][k] + dist[k][j]:
+                    dist[i][j] = dist[i][k] + dist[k][j]
 
-    # Función para obtener el camino
-    def get_path(i, j):
-        if next[i][j] == -1:
-            return []
-        path = [i]
-        while i != j:
-            i = next[i][j]
-            path.append(i)
-        return path
+    return dist
 
-    # Función para consultar el camino y el costo entre dos vértices específicos
-    def consulta_camino(origen, destino):
-        if origen < 0 or destino < 0 or origen >= n or destino >= n:
-            return "Índices fuera de rango", []
-        if dp[origen][destino] == float('inf'):
-            return "No hay camino disponible", []
-        camino = get_path(origen, destino)
-        costo = dp[origen][destino]
-        return costo, camino
-    
-    return consulta_camino
+# Matriz de adyacencia del grafo
+weights = [
+    [10000, 10000, 10000, 1, 10000, 4, 10000, 3, 2, 4, 3, 10000, 2, 4, 2, 4, 10000, 5],
+    [10000, 10000, 1, 5, 4, 2, 3, 3, 4, 2, 3, 3, 4, 2, 4, 10000, 5, 1],
+    [5, 10000, 10000, 10000, 10000, 10000, 3, 10000, 1, 5, 2, 4, 10000, 2, 3, 3, 2, 10000],
+    [1, 5, 10000, 10000, 10000, 4, 3, 10000, 10000, 10000, 10000, 10000, 2, 4, 10000, 10000, 4, 10000],
+    [2, 4, 4, 2, 10000, 10000, 4, 2, 10000, 3, 4, 2, 3, 3, 1, 5, 5, 1],
+    [10000, 2, 2, 10000, 10000, 10000, 10000, 10000, 10000, 3, 2, 4, 10000, 3, 5, 10000, 1, 5],
+    [3, 3, 10000, 10000, 10000, 2, 10000, 10000, 10000, 4, 1, 5, 2, 10000, 10000, 5, 2, 10000],
+    [3, 3, 3, 3, 10000, 4, 10000, 10000, 10000, 2, 5, 1, 10000, 10000, 5, 1, 4, 2],
+    [2, 10000, 10000, 5, 3, 3, 2, 4, 10000, 10000, 2, 4, 1, 5, 3, 3, 2, 4],
+    [10000, 10000, 5, 1, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 3, 10000, 4, 10000],
+    [10000, 10000, 2, 4, 10000, 2, 10000, 10000, 2, 4, 10000, 10000, 5, 10000, 4, 10000, 3, 3],
+    [3, 3, 4, 2, 10000, 10000, 10000, 10000, 10000, 2, 10000, 10000, 1, 5, 2, 4, 10000, 3],
+    [2, 10000, 4, 10000, 10000, 3, 10000, 4, 10000, 5, 10000, 10000, 10000, 10000, 10000, 4, 10000, 3],
+    [10000, 10000, 10000, 4, 10000, 3, 4, 2, 10000, 1, 1, 10000, 10000, 10000, 10000, 2, 10000, 10000],
+    [10000, 10000, 10000, 3, 10000, 10000, 1, 10000, 3, 10000, 10000, 10000, 2, 4, 10000, 10000, 2, 4],
+    [10000, 2, 3, 3, 10000, 1, 10000, 1, 3, 3, 2, 10000, 4, 10000, 10000, 10000, 4, 2],
+    [1, 10000, 10000, 4, 10000, 10000, 2, 10000, 10000, 4, 3, 3, 3, 3, 10000, 10000, 10000, 10000],
+    [10000, 10000, 4, 2, 1, 5, 4, 2, 10000, 2, 10000, 10000, 10000, 3, 4, 10000, 10000, 10000]
+]
 
 
-def reorganizar_fund(fundamentales):
-    fund_reorganizado = []
-    for inicio, final in fundamentales:
-        fund_reorganizado.append((abs(inicio), "positivo" if inicio >= 0 else "negativo"))
-        fund_reorganizado.append((abs(final), "positivo" if final >= 0 else "negativo"))
-    return fund_reorganizado
+# Aplicar el algoritmo de Floyd-Warshall
+result = floyd_warshall(weights)
 
-if __name__ == "__main__":
-    number_of_cases = int(sys.stdin.readline().strip())
-    for _ in range(number_of_cases):
-        n, w1, w2 = map(int, sys.stdin.readline().split())
-        fundamentales = []
-        libres=[]
-        for l in range(n):
-            n1, n2 = map(int, sys.stdin.readline().strip().split())
-            fundamentales.append((n1, n2))
-            if n1 not in libres:
-                libres.append(n1)
-                libres.append(-n1)
-            if n2 not in libres:
-                libres.append(n2)
-                libres.append(-n2)
-        reorganizados = reorganizar_fund(fundamentales)
-        rta = compuesto_(fundamentales,reorganizados,libres,w1,w2)
-        #print(fundamentales)
-        #print(reorganizados)
-        #print(libres)
-        print(rta)
-
+# Imprimir la matriz de distancias resultante
+for row in result:
+    print(row)

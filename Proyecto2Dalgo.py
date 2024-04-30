@@ -22,7 +22,6 @@ def compuesto_(fundamentales, libres, w1, w2):
         for j in caminos[1:]:
             camino.append(libres[j])
     camino.append(fund_toll[-1])
-    #caminoMinimo=floyd_warshall(energia)
     #print(caminoMinimo)
 
     return f'{camino} {costoT}'
@@ -99,6 +98,7 @@ def energia_necesaria(libres, w1, w2, fundamentales):
                 dp[i][j] = calcular_ltp(m1, "positivo", m2, "negativo", w1, w2)
             if dp[i][j] != float('inf'):
                 next[i][j] = j
+    #print(dp)
 
     # Algoritmo de Floyd-Warshall
     for k in range(n):
