@@ -14,8 +14,9 @@ def compuesto_(fundamentales, fund_organizados, libres, w1, w2):
     fundamentales_ordenados = camino_euler(fundamentales)
     print(fundamentales_ordenados)
     fund_toll= enlace_toll(fundamentales_ordenados)
-    energia= energia_necesaria(libres,w1,w2)
-    print(energia)
+    energia= energia_necesaria(libres,w1,w2,fundamentales_ordenados)
+    caminoMinimo=floyd_warshall(energia)
+    print(caminoMinimo)
 
     return fund_toll
 
@@ -55,8 +56,6 @@ def camino_euler(fundamentales):
 
     return parejas_camino
 
-
-
 def enlace_toll(fundamentales):
     resultado = []
     resultado.append(fundamentales[0])
@@ -67,8 +66,14 @@ def enlace_toll(fundamentales):
         resultado.append(fundamentales[i])
     return resultado
 
-def enlaces_boltz(fundamentales, toll, libres, energia):
-    pass
+def floyd_warshall(grafo):
+    graph_size = len(grafo)
+    for initial in range(0,graph_size) :
+        for middle in range(0,graph_size) :
+            for end in range(0,graph_size) :
+                grafo[initial][end] = min(grafo[initial][end],
+                                          grafo[initial][middle] + grafo[middle][end])
+    return grafo
 
 def calcular_ltp(m1, c1, m2, c2, w1, w2):
     if c1 == c2:
@@ -76,12 +81,14 @@ def calcular_ltp(m1, c1, m2, c2, w1, w2):
     else:
         return w2 - abs(m1 - m2) % w2
     
-def energia_necesaria(libres,w1,w2):
+def energia_necesaria(libres,w1,w2,fundamentales):
     n = len(libres)
     dp = [[float('inf')] * n for _ in range(n)]
     for i in range(n):
         for j in range(n):
-            if libres[i]==libres[j]:
+            if (libres[i],libres[j]) in fundamentales:
+                dp[i][j]=10000
+            elif abs(libres[i])==abs(libres[j]):
                 dp[i][j]=10000
             elif (libres[i]< 0 and libres[j]< 0) or (libres[i]>= 0 and libres[j]>= 0):
                 m1= abs(libres[i])
@@ -91,6 +98,7 @@ def energia_necesaria(libres,w1,w2):
                 m1= abs(libres[i])
                 m2= abs(libres[j])
                 dp[i][j]=calcular_ltp(m1,"positivo",m2, "negativo",w1, w2)
+    print(dp)
     return dp
 
 def reorganizar_fund(fundamentales):
